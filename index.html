@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Listado Estudiantes – Cello</title>
+  <meta name="color-scheme" content="light">
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+
+      /* Paleta Musicala */
+      --cian:#06b6d4;
+      --azul:#2563eb;
+      --fucsia:#db2777;
+      --morado:#7c3aed;
+
+      /* Derivados */
+      --brand:#2563eb;
+      --brand-soft:#e8f0fe;
+      --brand-soft-2:#d2e3fc;
+
+      --radius:16px;
+      --radius-sm:10px;
+      --shadow:0 8px 24px rgba(16,24,40,0.08);
+      --shadow-sm:0 3px 10px rgba(16,24,40,0.06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.4;
+    }
+
+    /* Header con gradiente */
+    header.site{
+      position:sticky; top:0; z-index:10;
+      background:
+        linear-gradient(120deg, var(--cian), var(--azul), var(--fucsia), var(--morado));
+      background-size:200% 200%;
+      animation: grad 18s ease infinite;
+      color:#fff;
+      border-bottom:1px solid rgba(255,255,255,.18);
+    }
+    @keyframes grad{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .wrap{
+      max-width:1040px;
+      margin-inline:auto;
+      padding:16px 20px;
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .brand img{
+      width:48px; height:48px; object-fit:cover; border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,.2);
+      background:#fff;
+    }
+    .brand h1{ margin:0; font-size:clamp(18px,2.6vw,26px); font-weight:800; letter-spacing:.2px;}
+    .brand p{ margin:2px 0 0; opacity:.95; font-size:13px }
+
+    .controls{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .searchbox{
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(255,255,255,.6);
+      border-radius:12px; padding:10px 12px;
+      box-shadow: var(--shadow-sm);
+      color:#111827;
+    }
+    .searchbox input{
+      flex:1; border:none; outline:none; background:transparent;
+      font-size:15px; color:#111827;
+    }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+    .btn{
+      appearance:none; border:1px solid rgba(255,255,255,.55);
+      background:rgba(255,255,255,.16); color:#fff;
+      font-weight:700; padding:8px 12px; border-radius:10px;
+      cursor:pointer; text-decoration:none; display:inline-flex; gap:8px; align-items:center;
+      backdrop-filter: blur(4px);
+    }
+    .btn:hover{ background:rgba(255,255,255,.28); }
+
+    @media (min-width:900px){
+      .controls{ flex-direction:row; align-items:center; justify-content:space-between; }
+      .actions{ justify-content:flex-end; }
+    }
+
+    /* Contenido */
+    main .wrap{ gap:16px; }
+    .card{
+      background:var(--card); border-radius:var(--radius);
+      box-shadow: var(--shadow); padding:14px;
+    }
+    .status{ color:var(--muted); font-size:14px; padding:4px 2px 10px; }
+
+    .table-container{
+      overflow:auto; border-radius:12px; border:1px solid #eef2ff;
+    }
+    table{ width:100%; border-collapse:collapse; font-size:15px; min-width:720px; }
+    thead th, td{ padding:12px 10px; border-bottom:1px solid #eef2ff; text-align:left; vertical-align:top; }
+    thead th{
+      position:sticky; top:0; z-index:1; font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(0deg, #eef2ff, #eef2ff);
+      color:#1e293b;
+    }
+    tbody tr:nth-child(odd) td{ background:#fcfdff; }
+    tbody tr:hover td{ background:#f7faff; }
+
+    a.link{
+      display:inline-block; white-space:nowrap;
+      background:#eef2ff; border:1px solid #dbe3f6;
+      color:var(--brand); font-weight:700;
+      padding:7px 12px; border-radius:8px; text-decoration:none;
+    }
+    a.link:hover{ background:#e2e8ff; }
+
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:.25rem .5rem; border-radius:999px; font-weight:700; font-size:12px;
+      border:1px solid #e5e7eb; background:#fafafa; color:#334155;
+    }
+    .chip.ok{ border-color:#d1fae5; background:#ecfdf5; color:#065f46; }
+    .chip.warn{ border-color:#fef9c3; background:#fffbeb; color:#92400e; }
+    .chip.bad{ border-color:#fee2e2; background:#fef2f2; color:#991b1b; }
+
+    footer.note{
+      text-align:center; color:var(--muted); font-size:12px; padding:16px 0 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <header class="site">
+    <div class="wrap">
+      <div class="brand">
+        <img src="logo.png" alt="Musicala" />
+        <div>
+          <h1>Estudiantes de Cello</h1>
+          <p>Lista de registros de clase de los estudiantes de Cello</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="searchbox" role="search">
+          <span aria-hidden="true">🔎</span>
+          <input id="q" type="search" placeholder="Buscar por estudiante, docente, grupo, etc." autocomplete="off" />
+        </div>
+        <div class="actions">
+          <button id="reload" class="btn" type="button">↻ Recargar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main>
+    <div class="wrap">
+      <section class="card">
+        <div class="status" id="status">Cargando datos…</div>
+        <div class="table-container">
+          <table id="tabla" style="display:none">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+      <footer class="note">Tip: escribe “apuntes”, “canciones” o “drive” en el buscador para filtrar rápido enlaces clave.</footer>
+    </div>
+  </main>
+
+  <script>
+    // ===== Config =====
+    const CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQ_T66-s12TVI88KSIctFFs4FqBxwIuRwAlHmiLeM9_kcAd6QAntYsKVkmn67ySN7HGs-gFNk31P1f/pub?output=csv";
+
+    // Etiquetas bonitas según nombre de columna
+    const LINK_LABELS = [
+      { match:/apuntes|tareas|notas/i,      label:"📚 Ver apuntes y tareas" },
+      { match:/canciones|playlist|setlist|repertorio/i, label:"🎵 Ver lista de canciones" },
+      { match:/drive|carpeta|material|recursos/i,       label:"📂 Abrir carpeta" },
+      { match:/video|youtube|link/i,       label:"▶️ Ver video" },
+    ];
+
+    const tabla = document.getElementById("tabla");
+    const thead = tabla.querySelector("thead");
+    const tbody = tabla.querySelector("tbody");
+    const statusEl = document.getElementById("status");
+    const q = document.getElementById("q");
+    const reloadBtn = document.getElementById("reload");
+
+    let HEADERS = [];
+    let ROWS = [];
+    let FILTERED = [];
+
+    // CSV parser simple (maneja comas entre comillas y comillas escapadas "")
+    function splitCSVLine(line){
+      const out = [];
+      let cur = "", inQ = false;
+      for (let i=0; i<line.length; i++){
+        const ch = line[i];
+        if (ch === '"'){
+          if (inQ && line[i+1] === '"'){ cur += '"'; i++; }
+          else inQ = !inQ;
+        } else if (ch === ',' && !inQ){
+          out.push(cur); cur = "";
+        } else cur += ch;
+      }
+      out.push(cur);
+      return out.map(s=>{
+        let t = s.trim();
+        if (t.startsWith('"') && t.endsWith('"')) t = t.slice(1,-1).replace(/""/g,'"');
+        return t;
+      });
+    }
+
+    function isURL(v){
+      const t = (v||"").trim();
+      return t.startsWith("http://") || t.startsWith("https://");
+    }
+
+    function labelFor(header){
+      for (const r of LINK_LABELS){ if (r.match.test(header)) return r.label; }
+      return "🔗 Abrir enlace";
+    }
+
+    function buildHeader(){
+      const tr = document.createElement("tr");
+      HEADERS.forEach(h=>{
+        const th = document.createElement("th");
+        th.textContent = h || "—";
+        tr.appendChild(th);
+      });
+      thead.appendChild(tr);
+    }
+
+    function renderRows(data){
+      tbody.innerHTML = "";
+      data.forEach(row=>{
+        const tr = document.createElement("tr");
+        HEADERS.forEach((_, i)=>{
+          const val = row[i] ?? "";
+          const td = document.createElement("td");
+          const headerName = (HEADERS[i]||"").toLowerCase();
+
+          // Si hay columna "estado", dibujar chip
+          if (/^estado$/.test(headerName) && val){
+            const chip = document.createElement("span");
+            chip.className = "chip";
+            const t = val.toString().toLowerCase();
+            if (/ok|activo|al día|bien/.test(t)) chip.classList.add("ok");
+            else if (/pend|revis|proceso/.test(t)) chip.classList.add("warn");
+            else if (/baja|inactivo|bloq|atras/.test(t)) chip.classList.add("bad");
+            chip.textContent = val;
+            td.appendChild(chip);
+          } else if (isURL(val)){
+            const a = document.createElement("a");
+            a.href = val.trim(); a.target = "_blank"; a.rel="noopener";
+            a.className = "link";
+            a.textContent = labelFor(headerName);
+            td.appendChild(a);
+          } else {
+            td.textContent = val || "—";
+            if (!val) td.style.opacity = .6;
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      if (!data.length){
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = HEADERS.length || 1;
+        td.textContent = "No hay resultados con el filtro actual.";
+        td.style.color = "#6b7280";
+        td.style.fontStyle = "italic";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderTable(){
+      thead.innerHTML=""; tbody.innerHTML="";
+      buildHeader();
+      renderRows(FILTERED);
+    }
+
+    function applyFilter(text){
+      const t = text.trim().toLowerCase();
+      FILTERED = !t
+        ? ROWS.slice()
+        : ROWS.filter(r => r.some(c => (c||"").toString().toLowerCase().includes(t)));
+      statusEl.textContent = `${FILTERED.length} resultado(s)`;
+      renderTable();
+    }
+
+    async function loadCSV(){
+      statusEl.textContent = "Cargando datos…";
+      tabla.style.display = "none";
+      thead.innerHTML = ""; tbody.innerHTML = "";
+
+      try{
+        const resp = await fetch(CSV_URL, { cache:"no-store" });
+        const text = await resp.text();
+
+        const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
+        if (!lines.length) throw new Error("CSV vacío");
+        HEADERS = splitCSVLine(lines[0]);
+        ROWS = lines.slice(1).map(splitCSVLine);
+
+        FILTERED = ROWS.slice();
+        renderTable();
+        statusEl.textContent = `${ROWS.length} registro(s) cargados`;
+        tabla.style.display = "";
+      }catch(err){
+        console.error(err);
+        statusEl.innerHTML = `Error cargando la tabla 😞 <small style="opacity:.8">(${err.message||err})</small>`;
+      }
+    }
+
+    // Eventos
+    q.addEventListener("input", ()=>applyFilter(q.value));
+    reloadBtn.addEventListener("click", loadCSV);
+
+    // Init
+    loadCSV();
+  </script>
+</body>
+</html>
